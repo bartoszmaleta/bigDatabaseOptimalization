@@ -1,6 +1,5 @@
 package com.company.fillers;
 
-import com.company.loader.LoaderCsv;
 import com.company.loader.LoaderTxt;
 
 import java.io.IOException;
@@ -14,19 +13,16 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DatabaseFiller {
 
     public void fillCustomers() throws IOException {
-        LoaderCsv loaderCsv = new LoaderCsv();
         LoaderTxt loaderTxt = new LoaderTxt();
 
-        List<String[]> namesList, surnamesList, addressesList;
+        List<String[]> namesList, surnamesList;
 
-        loaderCsv.setPath("src/main/resources/addresses.csv");
-        addressesList = loaderCsv.load();
         loaderTxt.setPath("src/main/resources/first_names.txt");
         namesList = loaderTxt.load();
         loaderTxt.setPath("src/main/resources/last_names.txt");
         surnamesList = loaderTxt.load();
 
-        String login = generateRandomLogin();
+        int login = generateRandomLogin();
         String password = generateRandomPassword();
         String firstName = getRandomNameOrSurname(namesList);
         String secondName = getRandomNameOrSurname(namesList);
@@ -36,8 +32,6 @@ public class DatabaseFiller {
         final String INSERT_SQL = "INSERT INTO \"Customers\" (\"Login\", \"Password\", " +
                 "\"First_Name\", \"Second_Name\", \"Surname\", \"Birthday\") " +
                 "VALUES (?, ?, ?, ?, ?, ?);";
-
-
     }
 
     private String getRandomNameOrSurname(List<String[]> list) {
@@ -45,10 +39,10 @@ public class DatabaseFiller {
         return list.get(randomIndex)[0];
     }
 
-    private String generateRandomLogin() {
+    private int generateRandomLogin() {
         String numbers = "0123456789";
         StringBuilder sb = generateString(numbers);
-        return sb.toString();
+        return Integer.parseInt(sb.toString());
     }
 
     private String generateRandomPassword() {
@@ -69,6 +63,10 @@ public class DatabaseFiller {
     }
 
 
+    private int getRandomIndex(int max) {
+        return ThreadLocalRandom.current().nextInt(0, max);
+    }
+
     private String generateRandomBirthday() {
         long ms;
         Random rnd = new Random();
@@ -76,10 +74,6 @@ public class DatabaseFiller {
         Date dt = new Date(ms);
         Timestamp ts = new Timestamp(dt.getTime());
         return ts.toString().split(" ")[0];
-    }
-
-    private int getRandomIndex(int max) {
-        return ThreadLocalRandom.current().nextInt(0, max);
     }
 
     private String[] getRandomAddress(List<String[]> list) {
@@ -98,7 +92,6 @@ public class DatabaseFiller {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         BigInteger id;
         String login, password, firstName, secondName, surname, birthday;
-
     }
 
 
