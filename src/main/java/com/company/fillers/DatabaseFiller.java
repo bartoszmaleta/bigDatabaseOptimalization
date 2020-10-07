@@ -7,6 +7,7 @@ import com.company.loader.LoaderCsv;
 import com.company.loader.LoaderTxt;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.text.ParseException;
 import java.util.List;
@@ -66,7 +67,7 @@ public class DatabaseFiller {
         addressesList = loaderCsv.load();
         citiesList = loaderCsv.loadCities();
 
-        for (int i = 0; i < 19998; i++) {
+        for (int i = 0; i < 20000; i++) {
             String[] addressArr = getRandomAddress(addressesList);
             street = addressArr[0];
             postcode = addressArr[1];
@@ -103,17 +104,42 @@ public class DatabaseFiller {
         database.disconnect();
     }
 
-    private void insertCard(Connection c, long cardNumber, Date expirationDate, long customerId, short cardTypeId) {
-        final String INSERT_SQL = "INSERT INTO \"Cards\" (\"Card_Number\", \"Expiration_Date\", " +
-                "\"Customer_Id\", \"Card_Type_Id\") " +
-                "VALUES (?, ?, ?, ?);";
+    public void fillAccounts() throws SQLException {
+        long balance;
+        BigDecimal accountNumber;
+        short accountTypeId;
+
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        for (int i = 0; i < 20000; i++) {
+            balance = getRandomIndex(10000000);
+            accountNumber = BigDecimal.valueOf(generateRandomCardNumber());
+            accountTypeId = (short) ThreadLocalRandom.current().nextInt(1, 4 + 1);
+
+            insertAccount(balance, accountNumber, accountTypeId, c);
+        }
+
+        database.disconnect();
+    }
+
+    private void insertCustomer(Connection c, int login, String password, String firstName,
+                                String secondName, String surname, Date birthday) {
+        final String INSERT_SQL = "INSERT INTO \"Customers\" (\"Login\", \"Password\", " +
+                "\"First_Name\", \"Second_Name\", \"Surname\", \"Birthday\") " +
+                "VALUES (?, ?, ?, ?, ?, ?);";
 
         try {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
-            ps.setLong(1, cardNumber);
-            ps.setDate(2, expirationDate);
-            ps.setLong(3, customerId);
-            ps.setShort(4, cardTypeId);
+            ps.setInt(1, login);
+            ps.setString(2, password);
+            ps.setString(3, firstName);
+            ps.setString(4, secondName);
+            ps.setString(5, surname);
+            ps.setDate(6, birthday);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -139,20 +165,33 @@ public class DatabaseFiller {
         }
     }
 
-    private void insertCustomer(Connection c, int login, String password, String firstName,
-                                String secondName, String surname, Date birthday) {
-        final String INSERT_SQL = "INSERT INTO \"Customers\" (\"Login\", \"Password\", " +
-                "\"First_Name\", \"Second_Name\", \"Surname\", \"Birthday\") " +
-                "VALUES (?, ?, ?, ?, ?, ?);";
+    private void insertCard(Connection c, long cardNumber, Date expirationDate, long customerId, short cardTypeId) {
+        final String INSERT_SQL = "INSERT INTO \"Cards\" (\"Card_Number\", \"Expiration_Date\", " +
+                "\"Customer_Id\", \"Card_Type_Id\") " +
+                "VALUES (?, ?, ?, ?);";
 
         try {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
-            ps.setInt(1, login);
-            ps.setString(2, password);
-            ps.setString(3, firstName);
-            ps.setString(4, secondName);
-            ps.setString(5, surname);
-            ps.setDate(6, birthday);
+            ps.setLong(1, cardNumber);
+            ps.setDate(2, expirationDate);
+            ps.setLong(3, customerId);
+            ps.setShort(4, cardTypeId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void insertAccount(long balance, BigDecimal accountNumber, short accountTypeId, Connection c) {
+        final String INSERT_SQL = "INSERT INTO \"Accounts\" (\"Balance\", \"Account_Number\", " +
+                "\"Account_Type_Id\") " +
+                "VALUES (?, ?, ?);";
+
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setLong(1, balance);
+            ps.setBigDecimal(2, accountNumber);
+            ps.setShort(3, accountTypeId);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
