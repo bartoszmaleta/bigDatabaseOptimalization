@@ -188,6 +188,32 @@ public class DatabaseFiller {
         database.disconnect();
     }
 
+    public void fillTransactions() throws SQLException {
+        long value, accountIdFrom, accountIdTo, cardIdFrom, cardIdTo;
+        Timestamp timestamp;
+        short transactionTypeId;
+
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        for (int i = 0; i < 30000; i++) {
+            value = getRandomIndex(3000);
+            accountIdFrom = getRandomIndex(20004);
+            accountIdTo = getRandomIndex(20004);
+            cardIdFrom = getRandomIndex(34000);
+            cardIdTo = getRandomIndex(34000);
+            timestamp = getRandomTimestamp();
+            transactionTypeId = (short) ThreadLocalRandom.current().nextInt(1, 2 + 1);
+
+            insertTransaction(value, accountIdFrom, accountIdTo, cardIdFrom, cardIdTo, timestamp, transactionTypeId, c);
+        }
+
+        database.disconnect();
+    }
+
     private void insertCustomer(Connection c, int login, String password, String firstName,
                                 String secondName, String surname, Date birthday) {
         final String INSERT_SQL = "INSERT INTO \"Customers\" (\"Login\", \"Password\", " +
@@ -305,6 +331,26 @@ public class DatabaseFiller {
         }
     }
 
+    private void insertTransaction(long value, long accountIdFrom, long accountIdTo, long cardIdFrom, long cardIdTo, Timestamp timestamp, short transactionTypeId, Connection c) {
+        final String INSERT_SQL = "INSERT INTO \"Transactions\" (\"Value\", \"Transaction_Date\", \"Transaction_Type_Id\", " +
+                "\"Account_Id_From\", \"Account_Id_To\", \"Card_Id_From\", \"Card_Id_To\") " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?);";
+
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setLong(1, value);
+            ps.setTimestamp(2, timestamp);
+            ps.setShort(3, transactionTypeId);
+            ps.setLong(4, accountIdFrom);
+            ps.setLong(5, accountIdTo);
+            ps.setLong(6, cardIdFrom);
+            ps.setLong(7, cardIdTo);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String getRandomNameOrSurname(List<String[]> list) {
         int randomIndex = getRandomIndex(list.size());
         return list.get(randomIndex)[0];
@@ -340,12 +386,16 @@ public class DatabaseFiller {
     }
 
     private Date generateRandomBirthday() throws ParseException {
+        Timestamp ts = getRandomTimestamp();
+        return Date.valueOf(ts.toString().split(" ")[0]);
+    }
+
+    private Timestamp getRandomTimestamp() {
         long ms;
         Random rnd = new Random();
         ms = -946771200000L + (Math.abs(rnd.nextLong()) % (62L * 365 * 24 * 60 * 60 * 1000));
         Date dt = new Date(ms);
-        Timestamp ts = new Timestamp(dt.getTime());
-        return Date.valueOf(ts.toString().split(" ")[0]);
+        return new Timestamp(dt.getTime());
     }
 
     private String[] getRandomAddress(List<String[]> list) {
