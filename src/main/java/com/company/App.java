@@ -15,6 +15,7 @@ public class App {
 //        dbFiller.fillCards();
 //        dbFiller.fillAccounts();
 //        dbFiller.fillCustomersAccounts();
-        dbFiller.fillAccountsCards();
+//        dbFiller.fillAccountsCards();
+        dbFiller.fillCredits();
     }
 }
