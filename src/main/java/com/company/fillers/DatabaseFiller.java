@@ -16,7 +16,67 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DatabaseFiller {
 
-    public void fillCustomers() throws IOException, ParseException, SQLException {
+    public void fillAccountsTypes() throws SQLException {
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        insertAccountType(c, "Basic Account");
+        insertAccountType(c, "Savings Account");
+        insertAccountType(c, "Interest-Bearing Checking Account");
+        insertAccountType(c, "Money Market Account");
+
+        database.disconnect();
+    }
+
+    public void fillCardsTypes() throws SQLException {
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        insertCardType(c, "Credit card");
+        insertCardType(c, "Debit card");
+        insertCardType(c, "Charge card");
+        insertCardType(c, "ATM card");
+
+        database.disconnect();
+
+    }
+
+    public void fillCreditsTypes() throws SQLException {
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        insertCreditType(c, "Installment credit");
+        insertCreditType(c, "Revolving card");
+        insertCreditType(c, "Open card");
+
+        database.disconnect();
+
+    }
+
+    public void fillTransactionsTypes() throws SQLException {
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        insertTransactionType(c, "in");
+        insertTransactionType(c, "out");
+
+        database.disconnect();
+
+    }
+
+    public void fillCustomers() throws SQLException {
         LoaderTxt loaderTxt = new LoaderTxt();
 
         List<String[]> namesList, surnamesList;
@@ -214,6 +274,53 @@ public class DatabaseFiller {
         database.disconnect();
     }
 
+    private void insertAccountType(Connection c, String type) {
+        final String INSERT_SQL = "INSERT INTO \"Accounts_Types\" (\"Account_Type_Name\") VALUES(?);";
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setString(1, type);
+            ps.executeUpdate();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    private void insertCardType(Connection c, String type) {
+        final String INSERT_SQL = "INSERT INTO \"Cards_Types\" (\"Card_Type_Name\") VALUES(?);";
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setString(1, type);
+            ps.executeUpdate();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    private void insertCreditType(Connection c, String type) {
+        final String INSERT_SQL = "INSERT INTO \"Credits_Types\" (\"Credit_Type_Name\") VALUES(?);";
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setString(1, type);
+            ps.executeUpdate();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    private void insertTransactionType(Connection c, String type) {
+        final String INSERT_SQL = "INSERT INTO \"Transactions_Types\" (\"Transaction_Type_Name\") VALUES(?);";
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setString(1, type);
+            ps.executeUpdate();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
     private void insertCustomer(Connection c, int login, String password, String firstName,
                                 String secondName, String surname, Date birthday) {
         final String INSERT_SQL = "INSERT INTO \"Customers\" (\"Login\", \"Password\", " +
@@ -385,7 +492,7 @@ public class DatabaseFiller {
         return randomNum == 0 ? getRandomIndex(max) : randomNum;
     }
 
-    private Date generateRandomBirthday() throws ParseException {
+    private Date generateRandomBirthday() {
         Timestamp ts = getRandomTimestamp();
         return Date.valueOf(ts.toString().split(" ")[0]);
     }
