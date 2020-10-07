@@ -3,6 +3,7 @@ package com.company.fillers;
 import com.company.connector.DatabaseCredentials;
 import com.company.connector.JSONService;
 import com.company.connector.PostgreSQLJDBC;
+import com.company.loader.LoaderCsv;
 import com.company.loader.LoaderTxt;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.Random;
 
 public class DatabaseFiller {
 
-    public void fillCustomers() throws IOException, ParseException {
+    public void fillCustomers() throws IOException, ParseException, SQLException {
         LoaderTxt loaderTxt = new LoaderTxt();
 
         List<String[]> namesList, surnamesList;
@@ -43,6 +44,58 @@ public class DatabaseFiller {
             insertCustomer(c, login, password, firstName, secondName, surname, birthday);
         }
 
+        database.disconnect();
+    }
+
+    public void fillCustomersAddresses() throws SQLException {
+        LoaderCsv loaderCsv = new LoaderCsv();
+
+        List<String[]> addressesList;
+        List<String> citiesList;
+        String street, postcode, city, state;
+        long customerId;
+
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        loaderCsv.setPath("src/main/resources/addresses.csv");
+        addressesList = loaderCsv.load();
+        citiesList = loaderCsv.loadCities();
+
+        for (int i = 0; i < 19998; i++) {
+            String[] addressArr = getRandomAddress(addressesList);
+            street = addressArr[0];
+            postcode = addressArr[1];
+            city = getRandomCity(citiesList);
+            state = city;
+            customerId = getRandomIndex(20000);
+
+            insertCustomerAddress(c, street, postcode, city, state, customerId);
+        }
+
+        database.disconnect();
+    }
+
+    private void insertCustomerAddress(Connection c, String street, String postcode,
+                                       String city, String state, long customerId) {
+        final String INSERT_SQL = "INSERT INTO \"Customers_Addresses\" (\"Street\", \"Postcode\", " +
+                "\"City\", \"State\", \"Customer_Id\") " +
+                "VALUES (?, ?, ?, ?, ?);";
+
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setString(1, street);
+            ps.setString(2, postcode);
+            ps.setString(3, city);
+            ps.setString(4, state);
+            ps.setLong(5, customerId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void insertCustomer(Connection c, int login, String password, String firstName,
@@ -116,6 +169,11 @@ public class DatabaseFiller {
         exactAddress[0] = address;
         exactAddress[1] = zipcode;
         return exactAddress;
+    }
+
+    private String getRandomCity(List<String> list) {
+        int randomIndex = getRandomIndex(list.size());
+        return list.get(randomIndex);
     }
 
 
