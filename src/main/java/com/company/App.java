@@ -1,12 +1,14 @@
 package com.company;
 
-/**
- * Hello world!
- *
- */
-public class App 
-{
-    public static void main( String[] args ) {
-        System.out.println( "Hello World!" );
+import com.company.fillers.DatabaseFiller;
+
+import java.io.IOException;
+import java.text.ParseException;
+
+public class App {
+    public static void main(String[] args) throws IOException, ParseException {
+        System.out.println("Hello World!");
+        DatabaseFiller dbFiller = new DatabaseFiller();
+        dbFiller.fillCustomers();
     }
 }
