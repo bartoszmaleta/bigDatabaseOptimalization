@@ -12,5 +12,6 @@ public class App {
         DatabaseFiller dbFiller = new DatabaseFiller();
 //        dbFiller.fillCustomers();
 //        dbFiller.fillCustomersAddresses();
+//        dbFiller.fillCards();
     }
 }

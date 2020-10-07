@@ -11,6 +11,7 @@ import java.sql.*;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DatabaseFiller {
 
@@ -77,6 +78,46 @@ public class DatabaseFiller {
         }
 
         database.disconnect();
+    }
+
+    public void fillCards() throws ParseException, SQLException {
+        long cardNumber, customerId;
+        Date expirationDate;
+        short cardTypeId;
+
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        for (int i = 0; i < 31000; i++) {
+            cardNumber = generateRandomCardNumber();
+            expirationDate = generateRandomBirthday();
+            customerId = getRandomIndex(20000);
+            cardTypeId = (short) ThreadLocalRandom.current().nextInt(1, 4 + 1);
+
+            insertCard(c, cardNumber, expirationDate, customerId, cardTypeId);
+        }
+
+        database.disconnect();
+    }
+
+    private void insertCard(Connection c, long cardNumber, Date expirationDate, long customerId, short cardTypeId) {
+        final String INSERT_SQL = "INSERT INTO \"Cards\" (\"Card_Number\", \"Expiration_Date\", " +
+                "\"Customer_Id\", \"Card_Type_Id\") " +
+                "VALUES (?, ?, ?, ?);";
+
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setLong(1, cardNumber);
+            ps.setDate(2, expirationDate);
+            ps.setLong(3, customerId);
+            ps.setShort(4, cardTypeId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void insertCustomerAddress(Connection c, String street, String postcode,
@@ -174,6 +215,10 @@ public class DatabaseFiller {
     private String getRandomCity(List<String> list) {
         int randomIndex = getRandomIndex(list.size());
         return list.get(randomIndex);
+    }
+
+    private long generateRandomCardNumber() {
+        return Long.parseLong(generateRandomLogin() + String.valueOf(generateRandomLogin()));
     }
 
 
