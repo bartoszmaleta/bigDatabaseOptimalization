@@ -13,6 +13,7 @@ public class App {
 //        dbFiller.fillCustomers();
 //        dbFiller.fillCustomersAddresses();
 //        dbFiller.fillCards();
-        dbFiller.fillAccounts();
+//        dbFiller.fillAccounts();
+        dbFiller.fillCustomersAccounts();
     }
 }

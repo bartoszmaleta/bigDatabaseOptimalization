@@ -126,6 +126,25 @@ public class DatabaseFiller {
         database.disconnect();
     }
 
+    public void fillCustomersAccounts() throws SQLException {
+        long accountId, customerId;
+
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        for (int i = 0; i < 1102; i++) {
+            accountId = getRandomIndex(20004);
+            customerId = getRandomIndex(20004);
+
+            insertCustomersAccount(accountId, customerId, c);
+        }
+
+        database.disconnect();
+    }
+
     private void insertCustomer(Connection c, int login, String password, String firstName,
                                 String secondName, String surname, Date birthday) {
         final String INSERT_SQL = "INSERT INTO \"Customers\" (\"Login\", \"Password\", " +
@@ -198,6 +217,20 @@ public class DatabaseFiller {
         }
     }
 
+    private void insertCustomersAccount(long accountId, long customerId, Connection c) {
+        final String INSERT_SQL = "INSERT INTO \"Customers_Accounts\" (\"Account_Id\", \"Customer_Id\")" +
+                "VALUES (?, ?);";
+
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setLong(1, accountId);
+            ps.setLong(2, customerId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String getRandomNameOrSurname(List<String[]> list) {
         int randomIndex = getRandomIndex(list.size());
         return list.get(randomIndex)[0];
@@ -228,7 +261,8 @@ public class DatabaseFiller {
 
 
     private int getRandomIndex(int max) {
-        return new Random().nextInt(max);
+        int randomNum = new Random().nextInt(max);
+        return randomNum == 0 ? getRandomIndex(max) : randomNum;
     }
 
     private Date generateRandomBirthday() throws ParseException {
