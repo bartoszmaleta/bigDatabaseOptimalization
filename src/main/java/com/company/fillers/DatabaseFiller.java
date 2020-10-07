@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class DatabaseFiller {
 
-    public void fillCustomers() throws IOException, ParseException {
+    public void fillCustomers() throws IOException, ParseException, SQLException {
         LoaderTxt loaderTxt = new LoaderTxt();
 
         List<String[]> namesList, surnamesList;
@@ -43,6 +43,7 @@ public class DatabaseFiller {
             insertCustomer(c, login, password, firstName, secondName, surname, birthday);
         }
 
+        database.disconnect();
     }
 
     private void insertCustomer(Connection c, int login, String password, String firstName,
