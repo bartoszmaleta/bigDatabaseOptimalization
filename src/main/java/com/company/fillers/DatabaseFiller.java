@@ -145,6 +145,25 @@ public class DatabaseFiller {
         database.disconnect();
     }
 
+    public void fillAccountsCards() throws SQLException {
+        long cardId, accountId;
+
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
+
+        for (int i = 0; i < 20000; i++) {
+            accountId = getRandomIndex(20004);
+            cardId = getRandomIndex(20004);
+
+            insertAccountsCard(cardId, accountId, c);
+        }
+
+        database.disconnect();
+    }
+
     private void insertCustomer(Connection c, int login, String password, String firstName,
                                 String secondName, String surname, Date birthday) {
         final String INSERT_SQL = "INSERT INTO \"Customers\" (\"Login\", \"Password\", " +
@@ -225,6 +244,20 @@ public class DatabaseFiller {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
             ps.setLong(1, accountId);
             ps.setLong(2, customerId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void insertAccountsCard(long cardId, long accountId, Connection c) {
+        final String INSERT_SQL = "INSERT INTO \"Accounts_Cards\" (\"Card_Id\", \"Account_Id\")" +
+                "VALUES (?, ?);";
+
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setLong(1, cardId);
+            ps.setLong(2, accountId);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
