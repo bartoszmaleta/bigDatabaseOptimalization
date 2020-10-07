@@ -1,37 +1,68 @@
 package com.company.fillers;
 
+import com.company.connector.DatabaseCredentials;
+import com.company.connector.JSONService;
+import com.company.connector.PostgreSQLJDBC;
 import com.company.loader.LoaderTxt;
 
 import java.io.IOException;
-import java.math.BigInteger;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.sql.*;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class DatabaseFiller {
 
-    public void fillCustomers() throws IOException {
+    public void fillCustomers() throws IOException, ParseException {
         LoaderTxt loaderTxt = new LoaderTxt();
 
         List<String[]> namesList, surnamesList;
+        int login;
+        String password, firstName, secondName, surname;
+        Date birthday;
+
+        JSONService jsonService = new JSONService();
+        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
+        PostgreSQLJDBC database = new PostgreSQLJDBC();
+        database.connect(databaseCredentials);
+        Connection c = database.getConnection();
 
         loaderTxt.setPath("src/main/resources/first_names.txt");
         namesList = loaderTxt.load();
         loaderTxt.setPath("src/main/resources/last_names.txt");
         surnamesList = loaderTxt.load();
 
-        int login = generateRandomLogin();
-        String password = generateRandomPassword();
-        String firstName = getRandomNameOrSurname(namesList);
-        String secondName = getRandomNameOrSurname(namesList);
-        String surname = getRandomNameOrSurname(surnamesList);
-        String birthday = generateRandomBirthday();
+        for (int i = 0; i < 10000; i++) {
+            login = generateRandomLogin();
+            password = generateRandomPassword();
+            firstName = getRandomNameOrSurname(namesList);
+            secondName = getRandomNameOrSurname(namesList);
+            surname = getRandomNameOrSurname(surnamesList);
+            birthday = generateRandomBirthday();
 
+            insertCustomer(c, login, password, firstName, secondName, surname, birthday);
+        }
+
+    }
+
+    private void insertCustomer(Connection c, int login, String password, String firstName,
+                                String secondName, String surname, Date birthday) {
         final String INSERT_SQL = "INSERT INTO \"Customers\" (\"Login\", \"Password\", " +
                 "\"First_Name\", \"Second_Name\", \"Surname\", \"Birthday\") " +
                 "VALUES (?, ?, ?, ?, ?, ?);";
+
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setInt(1, login);
+            ps.setString(2, password);
+            ps.setString(3, firstName);
+            ps.setString(4, secondName);
+            ps.setString(5, surname);
+            ps.setDate(6, birthday);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getRandomNameOrSurname(List<String[]> list) {
@@ -64,16 +95,16 @@ public class DatabaseFiller {
 
 
     private int getRandomIndex(int max) {
-        return ThreadLocalRandom.current().nextInt(0, max);
+        return new Random().nextInt(max);
     }
 
-    private String generateRandomBirthday() {
+    private Date generateRandomBirthday() throws ParseException {
         long ms;
         Random rnd = new Random();
         ms = -946771200000L + (Math.abs(rnd.nextLong()) % (62L * 365 * 24 * 60 * 60 * 1000));
         Date dt = new Date(ms);
         Timestamp ts = new Timestamp(dt.getTime());
-        return ts.toString().split(" ")[0];
+        return Date.valueOf(ts.toString().split(" ")[0]);
     }
 
     private String[] getRandomAddress(List<String[]> list) {
@@ -85,13 +116,6 @@ public class DatabaseFiller {
         exactAddress[0] = address;
         exactAddress[1] = zipcode;
         return exactAddress;
-    }
-
-    private void createCustomersEntry() {
-        final String INSERT_SQL = "INSERT INTO customers () " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-        BigInteger id;
-        String login, password, firstName, secondName, surname, birthday;
     }
 
 

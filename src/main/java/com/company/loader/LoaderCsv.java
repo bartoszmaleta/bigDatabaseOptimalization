@@ -15,17 +15,20 @@ public class LoaderCsv implements Loader {
         this.filePath = path;
     }
 
-    public List<String[]> load() throws IOException {
-        File file = new File(this.filePath);
-        BufferedReader br = new BufferedReader(new FileReader(file));
+    public List<String[]> load() {
+        try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
+            List<String[]> content = new ArrayList<>();
 
-        String st;
-        List<String[]> content = new ArrayList<>();
+            String line = br.readLine();
+            while (line != null) {
+                content.add(line.split(","));
+                line = br.readLine();
+            }
 
-        while ((st = br.readLine()) != null) {
-            content.add(st.split(","));
+            return content;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        return content;
+        return new ArrayList<>();
     }
 }

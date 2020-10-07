@@ -1,7 +1,6 @@
 package com.company.loader;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,18 +15,20 @@ public class LoaderTxt implements Loader {
         this.filePath = path;
     }
 
-    public List<String[]> load() throws IOException {
-        File file = new File(this.filePath);
-        BufferedReader br = new BufferedReader(new FileReader(file));
+    public List<String[]> load() {
+        try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
+            List<String[]> content = new ArrayList<>();
 
-        String st;
-        List<String[]> content = new ArrayList<>();
-        String[] arr = new String[1];
-        while ((st = br.readLine()) != null) {
-            arr[0] = st;
-            content.add(arr);
+            String line = br.readLine();
+            while (line != null) {
+                content.add(new String[]{line});
+                line = br.readLine();
+            }
+
+            return content;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        return content;
+        return new ArrayList<>();
     }
 }
