@@ -31,4 +31,21 @@ public class LoaderCsv implements Loader {
         }
         return new ArrayList<>();
     }
+
+    public List<String> loadCities() {
+        try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/worldcities.csv"))) {
+            List<String> content = new ArrayList<>();
+
+            String line = br.readLine();
+            while (line != null) {
+                content.add(line.replaceAll("\"", "").split(",")[0]);
+                line = br.readLine();
+            }
+
+            return content;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
 }
