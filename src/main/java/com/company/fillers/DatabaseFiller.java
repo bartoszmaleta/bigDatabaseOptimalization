@@ -15,13 +15,15 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DatabaseFiller {
+    private final PostgreSQLJDBC database;
+    private Connection c;
+
+    public DatabaseFiller(DatabaseCredentials databaseCredentials) {
+        this.database = new PostgreSQLJDBC(databaseCredentials);
+    }
 
     public void fillAccountsTypes() throws SQLException {
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         insertAccountType(c, "Basic Account");
         insertAccountType(c, "Savings Account");
@@ -32,11 +34,7 @@ public class DatabaseFiller {
     }
 
     public void fillCardsTypes() throws SQLException {
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         insertCardType(c, "Credit card");
         insertCardType(c, "Debit card");
@@ -44,15 +42,10 @@ public class DatabaseFiller {
         insertCardType(c, "ATM card");
 
         database.disconnect();
-
     }
 
     public void fillCreditsTypes() throws SQLException {
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         insertCreditType(c, "Installment credit");
         insertCreditType(c, "Revolving card");
@@ -62,18 +55,36 @@ public class DatabaseFiller {
 
     }
 
+    //===================================================
+    public void fillTestTypes() throws SQLException {
+        c = database.getConnection2();
+
+        insertTestType(c, "in");
+        insertTestType(c, "out");
+
+        database.disconnect();
+    }
+
+    private void insertTestType(Connection c, String type) {
+        final String INSERT_SQL = "INSERT INTO \"Test_Types\" (\"Transaction_Type_Name\") VALUES(?);";
+        try {
+            PreparedStatement ps = c.prepareStatement(INSERT_SQL);
+            ps.setString(1, type);
+            ps.executeUpdate();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+    //===================================================
+
     public void fillTransactionsTypes() throws SQLException {
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         insertTransactionType(c, "in");
         insertTransactionType(c, "out");
 
         database.disconnect();
-
     }
 
     public void fillCustomers() throws SQLException {
@@ -84,16 +95,12 @@ public class DatabaseFiller {
         String password, firstName, secondName, surname;
         Date birthday;
 
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
-
         loaderTxt.setPath("src/main/resources/first_names.txt");
         namesList = loaderTxt.load();
         loaderTxt.setPath("src/main/resources/last_names.txt");
         surnamesList = loaderTxt.load();
+
+        c = database.getConnection2();
 
         for (int i = 0; i < 10000; i++) {
             login = generateRandomLogin();
@@ -117,15 +124,11 @@ public class DatabaseFiller {
         String street, postcode, city, state;
         long customerId;
 
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
-
         loaderCsv.setPath("src/main/resources/addresses.csv");
         addressesList = loaderCsv.load();
         citiesList = loaderCsv.loadCities();
+
+        c = database.getConnection2();
 
         for (int i = 0; i < 20000; i++) {
             String[] addressArr = getRandomAddress(addressesList);
@@ -146,11 +149,7 @@ public class DatabaseFiller {
         Date expirationDate;
         short cardTypeId;
 
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         for (int i = 0; i < 31000; i++) {
             cardNumber = generateRandomCardNumber();
@@ -169,11 +168,7 @@ public class DatabaseFiller {
         BigDecimal accountNumber;
         short accountTypeId;
 
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         for (int i = 0; i < 20000; i++) {
             balance = getRandomIndex(10000000);
@@ -189,11 +184,7 @@ public class DatabaseFiller {
     public void fillCustomersAccounts() throws SQLException {
         long accountId, customerId;
 
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         for (int i = 0; i < 1102; i++) {
             accountId = getRandomIndex(20004);
@@ -208,11 +199,7 @@ public class DatabaseFiller {
     public void fillAccountsCards() throws SQLException {
         long cardId, accountId;
 
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         for (int i = 0; i < 20000; i++) {
             accountId = getRandomIndex(20004);
@@ -230,11 +217,7 @@ public class DatabaseFiller {
         short creditTypeId;
         long accountId;
 
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         for (int i = 0; i < 19997; i++) {
             value = getRandomIndex(1000000);
@@ -253,11 +236,7 @@ public class DatabaseFiller {
         Timestamp timestamp;
         short transactionTypeId;
 
-        JSONService jsonService = new JSONService();
-        DatabaseCredentials databaseCredentials = jsonService.readEnvironment();
-        PostgreSQLJDBC database = new PostgreSQLJDBC();
-        database.connect(databaseCredentials);
-        Connection c = database.getConnection();
+        c = database.getConnection2();
 
         for (int i = 0; i < 30000; i++) {
             value = getRandomIndex(3000);
@@ -280,7 +259,6 @@ public class DatabaseFiller {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
             ps.setString(1, type);
             ps.executeUpdate();
-
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -292,7 +270,6 @@ public class DatabaseFiller {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
             ps.setString(1, type);
             ps.executeUpdate();
-
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -315,7 +292,6 @@ public class DatabaseFiller {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
             ps.setString(1, type);
             ps.executeUpdate();
-
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -381,7 +357,6 @@ public class DatabaseFiller {
         final String INSERT_SQL = "INSERT INTO \"Accounts\" (\"Balance\", \"Account_Number\", " +
                 "\"Account_Type_Id\") " +
                 "VALUES (?, ?, ?);";
-
         try {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
             ps.setLong(1, balance);
@@ -396,7 +371,6 @@ public class DatabaseFiller {
     private void insertCustomersAccount(long accountId, long customerId, Connection c) {
         final String INSERT_SQL = "INSERT INTO \"Customers_Accounts\" (\"Account_Id\", \"Customer_Id\")" +
                 "VALUES (?, ?);";
-
         try {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
             ps.setLong(1, accountId);
@@ -410,7 +384,6 @@ public class DatabaseFiller {
     private void insertAccountsCard(long cardId, long accountId, Connection c) {
         final String INSERT_SQL = "INSERT INTO \"Accounts_Cards\" (\"Card_Id\", \"Account_Id\")" +
                 "VALUES (?, ?);";
-
         try {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
             ps.setLong(1, cardId);
@@ -425,7 +398,6 @@ public class DatabaseFiller {
         final String INSERT_SQL = "INSERT INTO \"Credits\" (\"Value\", \"Interest\", " +
                 "\"Credit_Type_Id\", \"Account_Id\") " +
                 "VALUES (?, ?, ?, ?);";
-
         try {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
             ps.setInt(1, value);
@@ -442,7 +414,6 @@ public class DatabaseFiller {
         final String INSERT_SQL = "INSERT INTO \"Transactions\" (\"Value\", \"Transaction_Date\", \"Transaction_Type_Id\", " +
                 "\"Account_Id_From\", \"Account_Id_To\", \"Card_Id_From\", \"Card_Id_To\") " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?);";
-
         try {
             PreparedStatement ps = c.prepareStatement(INSERT_SQL);
             ps.setLong(1, value);
@@ -486,7 +457,6 @@ public class DatabaseFiller {
         return sb;
     }
 
-
     private int getRandomIndex(int max) {
         int randomNum = new Random().nextInt(max);
         return randomNum == 0 ? getRandomIndex(max) : randomNum;
@@ -524,38 +494,5 @@ public class DatabaseFiller {
     private long generateRandomCardNumber() {
         return Long.parseLong(generateRandomLogin() + String.valueOf(generateRandomLogin()));
     }
-
-
-//    YAGNI
-//
-//    private void insert(Object o, String table, String... columns) {
-//        final String INSERT_SQL = "INSERT INTO " + table + " (" + createColumns(columns) + ") " +
-//                "VALUES (" + createQuestionMarks(columns.length) + ");";
-//    }
-//
-//    private String createColumns(String... variables) {
-//        StringBuilder sb = new StringBuilder();
-//        for (int i = 0; i < variables.length; i++) {
-//            if (i == variables.length - 1) {
-//                sb.append(variables[i]);
-//            } else {
-//                sb.append(variables[i]).append(", ");
-//            }
-//        }
-//        return sb.toString();
-//    }
-//
-//
-//    private String createQuestionMarks(int amount) {
-//        StringBuilder sb = new StringBuilder();
-//        for (int i = 0; i < amount; i++) {
-//            if (i == amount - 1) {
-//                sb.append("?");
-//            } else {
-//                sb.append("?").append(", ");
-//            }
-//        }
-//        return sb.toString();
-//    }
 }
 
