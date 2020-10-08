@@ -22,4 +22,18 @@ public class JSONService {
         }
         return null;
     }
+
+    public DatabaseCredentials readEnvironment2(String path) {
+
+        try {
+            Gson gson = new Gson();
+            BufferedReader reader = Files.newBufferedReader(Paths.get(path));
+            DatabaseCredentials credentials = gson.fromJson(reader, DatabaseCredentials.class);
+            reader.close();
+            return credentials;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 }

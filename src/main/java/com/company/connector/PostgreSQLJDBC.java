@@ -4,21 +4,32 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class PostgreSQLJDBC {
+public class PostgreSQLJDBC implements Connectable {
+    String HOST;
+    String PORT;
+    String DATABASE;
+    String LOGIN;
+    String PASSWORD;
+
+    public PostgreSQLJDBC(DatabaseCredentials databaseCredentials) {
+        this.HOST = databaseCredentials.getHost();
+        this.PORT = databaseCredentials.getPort();
+        this.DATABASE = databaseCredentials.getDatabase();
+        this.LOGIN = databaseCredentials.getLogin();
+        this.PASSWORD = databaseCredentials.getPassword();
+    }
+
+    public PostgreSQLJDBC() {
+    }
 
     private Connection c;
 
     public void connect(DatabaseCredentials databaseCredentials) {
-        String HOST = databaseCredentials.getHost();
-        String PORT = databaseCredentials.getPort();
-        String DATABASE = databaseCredentials.getDatabase();
-        String LOGIN = databaseCredentials.getLogin();
-        String PASSWORD = databaseCredentials.getPassword();
-
         try {
             this.c = DriverManager.getConnection("jdbc:postgresql://" + HOST + ":" + PORT + "/" + DATABASE, LOGIN, PASSWORD);
             System.out.println("Database connection opened.");
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            System.out.println("Error! Cannot connect with the database.");
             e.printStackTrace();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
@@ -32,5 +43,24 @@ public class PostgreSQLJDBC {
 
     public Connection getConnection() {
         return this.c;
+    }
+
+    public Connection getConnection2() {
+        try {
+            this.c = DriverManager.getConnection("jdbc:postgresql://" + HOST + ":" + PORT + "/" + DATABASE, LOGIN, PASSWORD);
+            System.out.println("Database connection opened.");
+            return this.c;
+        } catch (SQLException e) {
+            System.out.println("Error! Cannot connect with the database.");
+            e.printStackTrace();
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+            return null;
+        }
+    }
+
+    @Override
+    public void connect() {
+
     }
 }
