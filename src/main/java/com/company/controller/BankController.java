@@ -40,6 +40,7 @@ public class BankController {
     }
 
     private void displayNumberOfCustomers() {
+        System.out.println("displayNumberOfCustomers");
         bankService.showNumberOfCustomers();
     }
 }

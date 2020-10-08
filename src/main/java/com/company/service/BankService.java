@@ -16,7 +16,8 @@ public class BankService {
     }
 
     public void showNumberOfCustomers() {
-        c = this.database.getConnection2();
+        System.out.println("showNumberOfCustomers");
 
+//        c = this.database.getConnection2();
     }
 }

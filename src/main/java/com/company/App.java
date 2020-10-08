@@ -14,7 +14,8 @@ import java.text.ParseException;
 public class App {
     public static void main(String[] args) throws IOException, ParseException, SQLException {
 
-        DatabaseFiller dbFiller = new DatabaseFiller(new JSONService().readEnvironment2("src/main/resources/environment2.json"));
+//         FILLERS
+//        DatabaseFiller dbFiller = new DatabaseFiller(new JSONService().readEnvironment2("src/main/resources/environment2.json"));
 
 //        dbFiller.fillAccountsTypes();
 //        dbFiller.fillCardsTypes();
@@ -32,7 +33,9 @@ public class App {
 //        dbFiller.fillTransactions();
 
 
+        // CONTROL
         BankController bankController = new BankController(
                 new BankService("src/main/resources/environment2.json"));
+        bankController.init();
     }
 }
