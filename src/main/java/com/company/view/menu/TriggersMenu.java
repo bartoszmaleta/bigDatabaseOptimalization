@@ -12,9 +12,6 @@ public class TriggersMenu {
         System.out.println("     (3) Display ");
         System.out.println("     (4) Display ");
         System.out.println("     (5) Display ");
-        System.out.println("     (6) Display ");
-        System.out.println("     (7) Display ");
-        System.out.println("     (8) Display ");
         System.out.println("     (0) Exit program");
         System.out.println();
         System.out.println("Your choice : ");
