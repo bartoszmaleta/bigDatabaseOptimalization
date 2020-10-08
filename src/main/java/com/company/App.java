@@ -12,17 +12,19 @@ import java.sql.SQLException;
 import java.text.ParseException;
 
 public class App {
+
     public static void main(String[] args) throws IOException, ParseException, SQLException {
+        String ENVIRONMENT_PATH = "src/main/resources/environment2.json";
 
 //         FILLERS
-//        DatabaseFiller dbFiller = new DatabaseFiller(new JSONService().readEnvironment2("src/main/resources/environment2.json"));
-
+//        DatabaseFiller dbFiller = new DatabaseFiller(new JSONService().readEnvironment2(ENVIRONMENT_PATH));
+//
 //        dbFiller.fillAccountsTypes();
 //        dbFiller.fillCardsTypes();
 //        dbFiller.fillCreditsTypes();
 //        dbFiller.fillTransactionsTypes();
 //        dbFiller.fillTestTypes();
-//
+
 //        dbFiller.fillCustomers();
 //        dbFiller.fillCustomersAddresses();
 //        dbFiller.fillCards();
@@ -33,9 +35,9 @@ public class App {
 //        dbFiller.fillTransactions();
 
 
-        // CONTROL
+//         CONTROL
         BankController bankController = new BankController(
-                new BankService("src/main/resources/environment2.json"));
+                new BankService(ENVIRONMENT_PATH));
         bankController.init();
     }
 }
