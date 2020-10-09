@@ -7,10 +7,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 public class BankService {
-    private PostgreSQLJDBC database;
+    private final PostgreSQLJDBC database;
     private Connection c;
 
     public BankService(String path) {
@@ -184,5 +183,19 @@ public class BankService {
             database.disconnect();
         }
         return sb.toString();
+    }
+
+    public int getAverageBalance() throws SQLException {
+        try {
+            c = database.getConnection2();
+            PreparedStatement ps = c.prepareStatement("SELECT average_balance();");
+            ResultSet rs = ps.executeQuery();
+            return rs.getInt("average_balance");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            database.disconnect();
+        }
+        return 0;
     }
 }

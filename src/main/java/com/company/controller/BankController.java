@@ -179,6 +179,7 @@ public class BankController {
                     displaySumOfTopNumberProviedeRichestCustomersBalances();
                     break;
                 case "3":
+                    displayAverageBalance();
                     break;
                 case "4":
                     break;
@@ -189,6 +190,11 @@ public class BankController {
                     System.out.println("Wrong input!");
             }
         }
+    }
+
+    private void displayAverageBalance() throws SQLException {
+        int averageBalance = bankService.getAverageBalance();
+        FunctionsView.printBalance(averageBalance);
     }
 
     private void displaySumOfTopNumberProviedeRichestCustomersBalances() throws SQLException {
