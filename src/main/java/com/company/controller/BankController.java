@@ -6,6 +6,7 @@ import com.company.view.menu.*;
 import com.company.view.TerminalView;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 
 public class BankController {
     private final BankService bankService;
@@ -14,7 +15,7 @@ public class BankController {
         this.bankService = bankService;
     }
 
-    public void init() throws FileNotFoundException {
+    public void init() throws FileNotFoundException, SQLException {
         boolean isRunning = true;
         TerminalView.displayWelcomeScreen();
 
@@ -26,11 +27,9 @@ public class BankController {
             switch (option) {
                 case "1":
                     displayViewsMenu();
-                    displayNumberOfCustomers();
                     break;
                 case "2":
                     displayIndexesMenu();
-//                    displayFiveCustomersWithBiggestBalance();
                     break;
                 case "3":
                     displayTriggersMenu();
@@ -137,7 +136,7 @@ public class BankController {
 
     // ==========================================
     // FUNCTIONS MENU
-    private void displayFunctionsMenu() {
+    private void displayFunctionsMenu() throws SQLException {
         boolean isRunning = true;
         while (isRunning) {
             TerminalView.clearScreen();
@@ -163,7 +162,7 @@ public class BankController {
         }
     }
 
-    private void displayNumberOfCustomers() {
+    private void displayNumberOfCustomers() throws SQLException {
         System.out.println("displayNumberOfCustomers");
         bankService.showNumberOfCustomers();
     }
