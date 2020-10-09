@@ -244,4 +244,18 @@ public class BankService {
         }
         return 0;
     }
+
+    public int getCountOfTransactionsWhereValueGreaterThanProvidedValue(int valueProvided) throws SQLException {
+        try {
+            c = database.getConnection2();
+            PreparedStatement ps = c.prepareStatement("SELECT count_transactions_where_value_greater_than_parameter();");
+            ResultSet rs = ps.executeQuery();
+            return rs.getInt("count_transactions_where_value_greater_than_parameter");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            database.disconnect();
+        }
+        return 0;
+    }
 }

@@ -17,4 +17,8 @@ public class FunctionsView {
     public static void printValue(int value) {
         System.out.println("value = " + value);
     }
+
+    public static void printCount(int count) {
+        System.out.println("count = " + count);
+    }
 }

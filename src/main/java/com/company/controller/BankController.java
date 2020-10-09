@@ -176,7 +176,7 @@ public class BankController {
                     displayNumberOfCustomers();
                     break;
                 case "2":
-                    displaySumOfTopNumberProviedeRichestCustomersBalances();
+                    displayCountOfTransactionsWhereValueGreaterThanProvidedValue();
                     break;
                 case "3":
                     displayAverageBalance();
@@ -196,6 +196,12 @@ public class BankController {
         }
     }
 
+    private void displayCountOfTransactionsWhereValueGreaterThanProvidedValue() throws SQLException {
+        int valueProvided = InputTaker.takeIntInputWithMessage("Enter value: ");
+        int count = bankService.getCountOfTransactionsWhereValueGreaterThanProvidedValue(valueProvided);
+        FunctionsView.printCount(count);
+    }
+
     private void displayAverageTransactionValue() throws SQLException {
         int value = bankService.getAverageTransactionValue();
         FunctionsView.printValue(value);
@@ -211,6 +217,7 @@ public class BankController {
         FunctionsView.printBalance(averageBalance);
     }
 
+    // TODO:
     private void displaySumOfTopNumberProviedeRichestCustomersBalances() throws SQLException {
         int numberOfCustomersToSumBalances = InputTaker.takeIntInputWithMessage("How many customers balances You want to sum?");
         int result = bankService.showSumOfProvidedNumberCustomersBalances(numberOfCustomersToSumBalances);
