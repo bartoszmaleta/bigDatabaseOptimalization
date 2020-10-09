@@ -89,7 +89,8 @@ CREATE TABLE "Transactions"
     "Account_Id_To"       BIGINT    NOT NULL REFERENCES "Accounts" ("Account_Id"),
     "Card_Id_From"        BIGINT    NOT NULL REFERENCES "Cards" ("Card_Id"),
     "Card_Id_To"          BIGINT    NOT NULL REFERENCES "Cards" ("Card_Id"),
-    PRIMARY KEY ("Transaction_Id")
+    PRIMARY KEY ("Transaction_Id"),
+    CHECK ("Value" > 0)
 );
 
 CREATE TABLE "Customers_Accounts"
