@@ -230,4 +230,18 @@ public class BankService {
         }
         return "There is none.";
     }
+
+    public int getAverageTransactionValue() throws SQLException {
+        try {
+            c = database.getConnection2();
+            PreparedStatement ps = c.prepareStatement("SELECT average_transaction_value();");
+            ResultSet rs = ps.executeQuery();
+            return rs.getInt("average_transaction_value");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            database.disconnect();
+        }
+        return 0;
+    }
 }

@@ -13,4 +13,8 @@ public class FunctionsView {
     public static void printBalances(String balances) {
         System.out.println("balances = \n" + balances);
     }
+
+    public static void printValue(int value) {
+        System.out.println("value = " + value);
+    }
 }

@@ -184,6 +184,9 @@ public class BankController {
                 case "4":
                     displayMaximumAndMinimumBalance();
                     break;
+                case "5":
+                    displayAverageTransactionValue();
+                    break;
                 case "0":
                     isRunning = false;
                     break;
@@ -191,6 +194,11 @@ public class BankController {
                     System.out.println("Wrong input!");
             }
         }
+    }
+
+    private void displayAverageTransactionValue() throws SQLException {
+        int value = bankService.getAverageTransactionValue();
+        FunctionsView.printValue(value);
     }
 
     private void displayMaximumAndMinimumBalance() throws SQLException {
