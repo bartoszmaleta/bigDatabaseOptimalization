@@ -198,4 +198,36 @@ public class BankService {
         }
         return 0;
     }
+
+    public String getMaxAndMinBalances() throws SQLException {
+        return getMinBalance() + getMaxBalance();
+    }
+
+    private String getMaxBalance() throws SQLException {
+        try {
+            c = database.getConnection2();
+            PreparedStatement ps = c.prepareStatement("SELECT max_balance();");
+            ResultSet rs = ps.executeQuery();
+            return "\nmax balance = " + rs.getInt("max_balance");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            database.disconnect();
+        }
+        return "There is none.";
+    }
+
+    private String getMinBalance() throws SQLException {
+        try {
+            c = database.getConnection2();
+            PreparedStatement ps = c.prepareStatement("SELECT min_balance();");
+            ResultSet rs = ps.executeQuery();
+            return "min balance = " + rs.getInt("min_balance");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            database.disconnect();
+        }
+        return "There is none.";
+    }
 }
