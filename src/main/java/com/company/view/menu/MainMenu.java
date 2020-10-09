@@ -11,7 +11,7 @@ public class MainMenu {
         System.out.println("     (2) Display indexes menu");
         System.out.println("     (3) Display triggers menu");
         System.out.println("     (4) Display functions menu");
-        System.out.println("     (0) Exit program");
+        System.out.println("     (0) Exit app");
         System.out.println();
         System.out.println("Your choice : ");
     }

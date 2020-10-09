@@ -12,7 +12,7 @@ public class FunctionsMenu {
         System.out.println("     (3) Display average of balance");
         System.out.println("     (4) Display min and max accounts balances");
         System.out.println("     (5) Display average of transactions");
-        System.out.println("     (0) Exit program");
+        System.out.println("     (0) Exit menu");
         System.out.println();
         System.out.println("Your choice : ");
     }

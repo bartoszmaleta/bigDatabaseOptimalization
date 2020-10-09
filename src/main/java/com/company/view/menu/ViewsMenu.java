@@ -12,7 +12,7 @@ public class ViewsMenu {
         System.out.println("     (3) Display 5 last transactions value");
         System.out.println("     (4) Display 5 youngest customers");
         System.out.println("     (5) Display 5 oldest customers");
-        System.out.println("     (0) Exit program");
+        System.out.println("     (0) Exit menu");
         System.out.println();
         System.out.println("Your choice : ");
     }
