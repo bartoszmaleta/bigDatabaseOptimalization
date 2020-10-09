@@ -355,4 +355,46 @@ public class BankService {
         }
         return sb.toString().length() != 0 ? sb.toString() : "There is no transaction";
     }
+
+    public String getCardExplainInfo() throws SQLException {
+        return getSelectCardWithoutIndex() + getSelectCardWithIndex();
+    }
+
+    private String getSelectCardWithoutIndex() throws SQLException {
+        PostgreSQLJDBC secondDatabase = new PostgreSQLJDBC(
+                new JSONService()
+                        .readEnvironment2(
+                                "src/main/resources/environmentWithoutIndex.json"));
+        StringBuilder sb = new StringBuilder();
+        try {
+            Connection connection = secondDatabase.getConnection2();
+            PreparedStatement ps = connection.prepareStatement("SELECT explain_select_card_by_expiration_date();");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            String select = rs.getString("explain_select_card_by_expiration_date");
+            sb.append("Select without index:\n").append(select);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            secondDatabase.disconnect();
+        }
+        return sb.toString().length() != 0 ? sb.toString() : "There is no card";
+    }
+
+    private String getSelectCardWithIndex() throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        try {
+            c = database.getConnection2();
+            PreparedStatement ps = c.prepareStatement("SELECT explain_select_card_by_expiration_date();");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            String select = rs.getString("explain_select_card_by_expiration_date");
+            sb.append("\n\nSelect with index:\n").append(select);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            database.disconnect();
+        }
+        return sb.toString().length() != 0 ? sb.toString() : "There is no card";
+    }
 }

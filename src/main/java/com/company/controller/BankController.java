@@ -125,6 +125,7 @@ public class BankController {
                     displayTimeOfSelectingTransactionByValueWithAndWithoutIndex();
                     break;
                 case "3":
+                    displayTimeOfSelectingCardByExpirationDateWithAndWithoutIndex();
                     break;
                 case "4":
                     break;
@@ -135,6 +136,11 @@ public class BankController {
                     System.out.println("Wrong input!");
             }
         }
+    }
+
+    private void displayTimeOfSelectingCardByExpirationDateWithAndWithoutIndex() throws SQLException {
+        String selectCardInfo = bankService.getCardExplainInfo();
+        IndexesView.printSelectInfos(selectCardInfo);
     }
 
     private void displayTimeOfSelectingTransactionByValueWithAndWithoutIndex() throws SQLException {
