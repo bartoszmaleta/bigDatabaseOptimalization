@@ -12,7 +12,7 @@ public class TriggersMenu {
         System.out.println("     (3) Display ");
         System.out.println("     (4) Display ");
         System.out.println("     (5) Display ");
-        System.out.println("     (0) Exit program");
+        System.out.println("     (0) Exit menu");
         System.out.println();
         System.out.println("Your choice : ");
     }

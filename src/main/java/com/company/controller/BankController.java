@@ -2,10 +2,14 @@ package com.company.controller;
 
 import com.company.service.BankService;
 import com.company.service.InputTaker;
+import com.company.view.FunctionsView;
+import com.company.view.IndexesView;
+import com.company.view.ViewsView;
 import com.company.view.menu.*;
 import com.company.view.TerminalView;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 
 public class BankController {
     private final BankService bankService;
@@ -14,7 +18,7 @@ public class BankController {
         this.bankService = bankService;
     }
 
-    public void init() throws FileNotFoundException {
+    public void init() throws FileNotFoundException, SQLException {
         boolean isRunning = true;
         TerminalView.displayWelcomeScreen();
 
@@ -26,11 +30,9 @@ public class BankController {
             switch (option) {
                 case "1":
                     displayViewsMenu();
-                    displayNumberOfCustomers();
                     break;
                 case "2":
                     displayIndexesMenu();
-//                    displayFiveCustomersWithBiggestBalance();
                     break;
                 case "3":
                     displayTriggersMenu();
@@ -49,7 +51,7 @@ public class BankController {
 
     // ==========================================
     // VIEWS MENU
-    private void displayViewsMenu() {
+    private void displayViewsMenu() throws SQLException {
         boolean isRunning = true;
         while (isRunning) {
             TerminalView.clearScreen();
@@ -58,13 +60,19 @@ public class BankController {
             String option = InputTaker.takeStringInputWithMessage("Choose: ");
             switch (option) {
                 case "1":
-                    displayFiveCustomersWithBiggestBalance();
+                    displayFiveCustomersInfo();
                     break;
                 case "2":
+                    displayCardTypes();
                     break;
                 case "3":
+                    displayLastFiveTransactionsInfo();
                     break;
                 case "4":
+                    displayFiveYoungestCustomers();
+                    break;
+                case "5":
+                    displayFiveOldestCustomers();
                     break;
                 case "0":
                     isRunning = false;
@@ -75,14 +83,34 @@ public class BankController {
         }
     }
 
-    private void displayFiveCustomersWithBiggestBalance() {
-        System.out.println("displayFive");
-//        bankService.showFirstFiveRichest();
+    private void displayLastFiveTransactionsInfo() throws SQLException {
+        String transactions = bankService.getFiveLastTransactions();
+        ViewsView.printLastFiveTransactions(transactions);
+    }
+
+    private void displayFiveYoungestCustomers() throws SQLException {
+        String customers = bankService.getFiveYoungestCustomers();
+        ViewsView.printFiveYoungestCustomers(customers);
+    }
+
+    private void displayFiveOldestCustomers() throws SQLException {
+        String customers = bankService.getFiveOldestCustomers();
+        ViewsView.printFiveOldestCustomers(customers);
+    }
+
+    private void displayCardTypes() throws SQLException {
+        String cardsTypes = bankService.getCardsTypes();
+        ViewsView.printCardsTypes(cardsTypes);
+    }
+
+    private void displayFiveCustomersInfo() throws SQLException {
+        String customersInfo = bankService.getFirstFiveCustomersInfo();
+        ViewsView.printCustsInfo(customersInfo);
     }
 
     // ==========================================
     // INDEXES MENU
-    private void displayIndexesMenu() {
+    private void displayIndexesMenu() throws SQLException {
         boolean isRunning = true;
         while (isRunning) {
             TerminalView.clearScreen();
@@ -91,11 +119,13 @@ public class BankController {
             String option = InputTaker.takeStringInputWithMessage("Choose: ");
             switch (option) {
                 case "1":
-//                    displayTimeOfSelectingCustomerByBalanceWhereBalanceHasIndex();
+                    displayTimeOfSelectingCustomerByFirstNameWithAndWithoutIndex();
                     break;
                 case "2":
+                    displayTimeOfSelectingTransactionByValueWithAndWithoutIndex();
                     break;
                 case "3":
+                    displayTimeOfSelectingCardByExpirationDateWithAndWithoutIndex();
                     break;
                 case "4":
                     break;
@@ -106,6 +136,21 @@ public class BankController {
                     System.out.println("Wrong input!");
             }
         }
+    }
+
+    private void displayTimeOfSelectingCardByExpirationDateWithAndWithoutIndex() throws SQLException {
+        String selectCardInfo = bankService.getCardExplainInfo();
+        IndexesView.printSelectInfos(selectCardInfo);
+    }
+
+    private void displayTimeOfSelectingTransactionByValueWithAndWithoutIndex() throws SQLException {
+        String selectsInfos = bankService.getTransactionsExplainInfo();
+        IndexesView.printSelectInfos(selectsInfos);
+    }
+
+    private void displayTimeOfSelectingCustomerByFirstNameWithAndWithoutIndex() throws SQLException {
+        String selectsInfos = bankService.getSelectsInfo();
+        IndexesView.printSelectInfos(selectsInfos);
     }
 
     // ==========================================
@@ -137,7 +182,7 @@ public class BankController {
 
     // ==========================================
     // FUNCTIONS MENU
-    private void displayFunctionsMenu() {
+    private void displayFunctionsMenu() throws SQLException {
         boolean isRunning = true;
         while (isRunning) {
             TerminalView.clearScreen();
@@ -149,10 +194,16 @@ public class BankController {
                     displayNumberOfCustomers();
                     break;
                 case "2":
+                    displayCountOfTransactionsWhereValueGreaterThanProvidedValue();
                     break;
                 case "3":
+                    displayAverageBalance();
                     break;
                 case "4":
+                    displayMaximumAndMinimumBalance();
+                    break;
+                case "5":
+                    displayAverageTransactionValue();
                     break;
                 case "0":
                     isRunning = false;
@@ -163,8 +214,35 @@ public class BankController {
         }
     }
 
-    private void displayNumberOfCustomers() {
-        System.out.println("displayNumberOfCustomers");
+    private void displayCountOfTransactionsWhereValueGreaterThanProvidedValue() throws SQLException {
+        int valueProvided = InputTaker.takeIntInputWithMessage("Enter value: ");
+        int count = bankService.getCountOfTransactionsWhereValueGreaterThanProvidedValue(valueProvided);
+        FunctionsView.printCount(count);
+    }
+
+    private void displayAverageTransactionValue() throws SQLException {
+        int value = bankService.getAverageTransactionValue();
+        FunctionsView.printValue(value);
+    }
+
+    private void displayMaximumAndMinimumBalance() throws SQLException {
+        String balances = bankService.getMaxAndMinBalances();
+        FunctionsView.printBalances(balances);
+    }
+
+    private void displayAverageBalance() throws SQLException {
+        int averageBalance = bankService.getAverageBalance();
+        FunctionsView.printBalance(averageBalance);
+    }
+
+    // TODO:
+    private void displaySumOfTopNumberProviedeRichestCustomersBalances() throws SQLException {
+        int numberOfCustomersToSumBalances = InputTaker.takeIntInputWithMessage("How many customers balances You want to sum?");
+        int result = bankService.showSumOfProvidedNumberCustomersBalances(numberOfCustomersToSumBalances);
+        FunctionsView.printSumOfTopRichestCustomersBalances(result);
+    }
+
+    private void displayNumberOfCustomers() throws SQLException {
         bankService.showNumberOfCustomers();
     }
 }

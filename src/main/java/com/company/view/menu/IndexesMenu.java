@@ -7,12 +7,12 @@ public class IndexesMenu {
         System.out.println("     *            INDEXES  MENU             *");
         System.out.println("     ****************************************");
         System.out.println("     What do you want to do ?");
-        System.out.println("     (1) Display time of selecting customer by surname when there is index on 'surname' column'");
-        System.out.println("     (2) Display time of selecting customer by firstname when there is index on 'firstname' column' ");
-        System.out.println("     (3) Display ");
+        System.out.println("     (1) Display difference between time of selecting customer by firstname when there is index on 'First_Name' column and when there isn't ");
+        System.out.println("     (2) Display difference between time of select with and without index on 'Value' column in Transactions table");
+        System.out.println("     (3) Display difference between time of selecting card by expiration date when there is index on 'Expiration_Date' column and when there isn't");
         System.out.println("     (4) Display ");
         System.out.println("     (5) Display ");
-        System.out.println("     (0) Exit program");
+        System.out.println("     (0) Exit menu");
         System.out.println();
         System.out.println("Your choice : ");
     }
