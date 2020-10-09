@@ -3,6 +3,7 @@ package com.company.controller;
 import com.company.service.BankService;
 import com.company.service.InputTaker;
 import com.company.view.FunctionsView;
+import com.company.view.IndexesView;
 import com.company.view.ViewsView;
 import com.company.view.menu.*;
 import com.company.view.TerminalView;
@@ -109,7 +110,7 @@ public class BankController {
 
     // ==========================================
     // INDEXES MENU
-    private void displayIndexesMenu() {
+    private void displayIndexesMenu() throws SQLException {
         boolean isRunning = true;
         while (isRunning) {
             TerminalView.clearScreen();
@@ -118,9 +119,10 @@ public class BankController {
             String option = InputTaker.takeStringInputWithMessage("Choose: ");
             switch (option) {
                 case "1":
-//                    displayTimeOfSelectingCustomerByBalanceWhereBalanceHasIndex();
+                    displayTimeOfSelectingCustomerByFirstNameWithAndWithoutIndex();
                     break;
                 case "2":
+                    displayTimeOfSelectingTransactionByValueWithAndWithoutIndex();
                     break;
                 case "3":
                     break;
@@ -133,6 +135,16 @@ public class BankController {
                     System.out.println("Wrong input!");
             }
         }
+    }
+
+    private void displayTimeOfSelectingTransactionByValueWithAndWithoutIndex() throws SQLException {
+        String selectsInfos = bankService.getTransactionsExplainInfo();
+        IndexesView.printSelectInfos(selectsInfos);
+    }
+
+    private void displayTimeOfSelectingCustomerByFirstNameWithAndWithoutIndex() throws SQLException {
+        String selectsInfos = bankService.getSelectsInfo();
+        IndexesView.printSelectInfos(selectsInfos);
     }
 
     // ==========================================

@@ -40,6 +40,8 @@ public class BankService {
             PreparedStatement ps = c.prepareStatement("SELECT richest_balances_sum(?);");
             ps.setString(1, String.valueOf(numberOfCustomersToSumBalances));
             ResultSet rs = ps.executeQuery();
+            rs.next();
+
             return rs.getInt("richest_balances_sum");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -190,6 +192,8 @@ public class BankService {
             c = database.getConnection2();
             PreparedStatement ps = c.prepareStatement("SELECT average_balance();");
             ResultSet rs = ps.executeQuery();
+            rs.next();
+
             return rs.getInt("average_balance");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -208,6 +212,8 @@ public class BankService {
             c = database.getConnection2();
             PreparedStatement ps = c.prepareStatement("SELECT max_balance();");
             ResultSet rs = ps.executeQuery();
+            rs.next();
+
             return "\nmax balance = " + rs.getInt("max_balance");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -222,6 +228,8 @@ public class BankService {
             c = database.getConnection2();
             PreparedStatement ps = c.prepareStatement("SELECT min_balance();");
             ResultSet rs = ps.executeQuery();
+            rs.next();
+
             return "min balance = " + rs.getInt("min_balance");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -236,6 +244,8 @@ public class BankService {
             c = database.getConnection2();
             PreparedStatement ps = c.prepareStatement("SELECT average_transaction_value();");
             ResultSet rs = ps.executeQuery();
+            rs.next();
+
             return rs.getInt("average_transaction_value");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -248,8 +258,9 @@ public class BankService {
     public int getCountOfTransactionsWhereValueGreaterThanProvidedValue(int valueProvided) throws SQLException {
         try {
             c = database.getConnection2();
-            PreparedStatement ps = c.prepareStatement("SELECT count_transactions_where_value_greater_than_parameter();");
+            PreparedStatement ps = c.prepareStatement("SELECT count_transactions_where_value_greater_than_parameter(" + valueProvided + ");");
             ResultSet rs = ps.executeQuery();
+            rs.next();
             return rs.getInt("count_transactions_where_value_greater_than_parameter");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -257,5 +268,91 @@ public class BankService {
             database.disconnect();
         }
         return 0;
+    }
+
+    public String getSelectsInfo() throws SQLException {
+        return getSelectWithoutIndex() + getSelectWithIndex();
+    }
+
+    private String getSelectWithoutIndex() throws SQLException {
+        PostgreSQLJDBC secondDatabase = new PostgreSQLJDBC(
+                new JSONService()
+                        .readEnvironment2(
+                                "src/main/resources/environmentWithoutIndex.json"));
+        StringBuilder sb = new StringBuilder();
+        try {
+            Connection connection = secondDatabase.getConnection2();
+            PreparedStatement ps = connection.prepareStatement("SELECT explain_select_customer_by_first_name();");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            String select = rs.getString("explain_select_customer_by_first_name");
+            sb.append("Select without index:\n").append(select);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            secondDatabase.disconnect();
+        }
+        return sb.toString().length() != 0 ? sb.toString() : "There is no customer";
+    }
+
+    private String getSelectWithIndex() throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        try {
+            c = database.getConnection2();
+            PreparedStatement ps = c.prepareStatement("SELECT explain_select_customer_by_first_name();");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+
+            String select = rs.getString("explain_select_customer_by_first_name");
+            sb.append("\n\nSelect with index:\n").append(select);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            database.disconnect();
+        }
+        return sb.toString().length() != 0 ? sb.toString() : "There is no customer";
+    }
+
+    public String getTransactionsExplainInfo() throws SQLException {
+        return getSelectTransactionWithoutIndex() + getSelectTransactionWithIndex();
+    }
+
+    private String getSelectTransactionWithIndex() throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        try {
+            c = database.getConnection2();
+            PreparedStatement ps = c.prepareStatement("SELECT explain_select_transaction_by_value();");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+
+            String select = rs.getString("explain_select_transaction_by_value");
+            sb.append("\n\nSelect with index:\n").append(select);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            database.disconnect();
+        }
+        return sb.toString().length() != 0 ? sb.toString() : "There is no transaction";
+    }
+
+    private String getSelectTransactionWithoutIndex() throws SQLException {
+        PostgreSQLJDBC secondDatabase = new PostgreSQLJDBC(
+                new JSONService()
+                        .readEnvironment2(
+                                "src/main/resources/environmentWithoutIndex.json"));
+        StringBuilder sb = new StringBuilder();
+        try {
+            Connection connection = secondDatabase.getConnection2();
+            PreparedStatement ps = connection.prepareStatement("SELECT explain_select_transaction_by_value();");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            String select = rs.getString("explain_select_transaction_by_value");
+            sb.append("Select without index:\n").append(select);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            secondDatabase.disconnect();
+        }
+        return sb.toString().length() != 0 ? sb.toString() : "There is no transaction";
     }
 }
