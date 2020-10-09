@@ -2,6 +2,8 @@ package com.company.controller;
 
 import com.company.service.BankService;
 import com.company.service.InputTaker;
+import com.company.view.FunctionsView;
+import com.company.view.ViewsView;
 import com.company.view.menu.*;
 import com.company.view.TerminalView;
 
@@ -48,7 +50,7 @@ public class BankController {
 
     // ==========================================
     // VIEWS MENU
-    private void displayViewsMenu() {
+    private void displayViewsMenu() throws SQLException {
         boolean isRunning = true;
         while (isRunning) {
             TerminalView.clearScreen();
@@ -57,13 +59,19 @@ public class BankController {
             String option = InputTaker.takeStringInputWithMessage("Choose: ");
             switch (option) {
                 case "1":
-                    displayFiveCustomersWithBiggestBalance();
+                    displayFiveCustomersInfo();
                     break;
                 case "2":
+                    displayCardTypes();
                     break;
                 case "3":
+                    displayLastFiveTransactionsInfo();
                     break;
                 case "4":
+                    displayFiveYoungestCustomers();
+                    break;
+                case "5":
+                    displayFiveOldestCustomers();
                     break;
                 case "0":
                     isRunning = false;
@@ -74,9 +82,29 @@ public class BankController {
         }
     }
 
-    private void displayFiveCustomersWithBiggestBalance() {
-        System.out.println("displayFive");
-//        bankService.showFirstFiveRichest();
+    private void displayLastFiveTransactionsInfo() throws SQLException {
+        String transactions = bankService.getFiveLastTransactions();
+        ViewsView.printLastFiveTransactions(transactions);
+    }
+
+    private void displayFiveYoungestCustomers() throws SQLException {
+        String customers = bankService.getFiveYoungestCustomers();
+        ViewsView.printFiveYoungestCustomers(customers);
+    }
+
+    private void displayFiveOldestCustomers() throws SQLException {
+        String customers = bankService.getFiveOldestCustomers();
+        ViewsView.printFiveOldestCustomers(customers);
+    }
+
+    private void displayCardTypes() throws SQLException {
+        String cardsTypes = bankService.getCardsTypes();
+        ViewsView.printCardsTypes(cardsTypes);
+    }
+
+    private void displayFiveCustomersInfo() throws SQLException {
+        String customersInfo = bankService.getFirstFiveCustomersInfo();
+        ViewsView.printCustsInfo(customersInfo);
     }
 
     // ==========================================
@@ -148,6 +176,7 @@ public class BankController {
                     displayNumberOfCustomers();
                     break;
                 case "2":
+                    displaySumOfTopNumberProviedeRichestCustomersBalances();
                     break;
                 case "3":
                     break;
@@ -162,8 +191,13 @@ public class BankController {
         }
     }
 
+    private void displaySumOfTopNumberProviedeRichestCustomersBalances() throws SQLException {
+        int numberOfCustomersToSumBalances = InputTaker.takeIntInputWithMessage("How many customers balances You want to sum?");
+        int result = bankService.showSumOfProvidedNumberCustomersBalances(numberOfCustomersToSumBalances);
+        FunctionsView.printSumOfTopRichestCustomersBalances(result);
+    }
+
     private void displayNumberOfCustomers() throws SQLException {
-        System.out.println("displayNumberOfCustomers");
         bankService.showNumberOfCustomers();
     }
 }
